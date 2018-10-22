@@ -5,8 +5,12 @@ import store from './store'
 
 Vue.config.productionTip = false
 
+Vue.filter('toUpperCase', function (str) {
+    return str.toUpperCase()
+})
+
 new Vue({
-  router,
-  store,
-  render: h => h(App)
+    router,
+    store,
+    render: h => h(App)
 }).$mount('#app')
