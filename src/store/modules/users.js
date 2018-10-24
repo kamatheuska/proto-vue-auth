@@ -2,22 +2,24 @@ import {
     UPDATE_USER_PROPS,
     SET_USER_TOKEN,
     SET_USER_AUTH,
-    CHANGE_SERVER_AUTH_STATUS,
+    SET_USER_ERROR,
+    UPDATE_USER_REGISTRATION,
     REMOVE_USER_TOKEN,
     REMOVE_USER_AUTH,
     REMOVE_CREDENTIALS,
-    // CHANGE_SERVER_REGISTER_STATUS,
+    // SERVER STATE
     SET_SERVER_AUTH_MESSAGE,
-    // SET_SERVER_REGISTER_MESSAGE,
-    SET_USER_ERROR
+    SET_SERVER_REGISTRATION_MESSAGE,
+    CHANGE_SERVER_AUTH_STATUS,
+    CHANGE_SERVER_REGISTRATION_STATUS
 } from '@/store/mutation-types'
 
 const state = {
     user: {
         name: '',
-        email: 'test3@example.com',
+        email: '',
         credentials: {
-            password: '123123123',
+            password: '',
             token: ''
         },
         auth: {
@@ -82,6 +84,10 @@ const mutations = {
         user.auth.isAuthenticated = true
         user.auth.error = false
     },
+    [UPDATE_USER_REGISTRATION] ({ user }, status = 'success') {
+        user.registration.status = status
+        user.registration.error = false
+    },
     [REMOVE_USER_AUTH] ({ user }, status = 'success') {
         user.auth.status = status
         user.auth.isAuthenticated = false
@@ -141,6 +147,60 @@ const actions = {
                     reject(error)
                 })
         })
+    },
+
+    signupUser ({ commit, getters, dispatch }) {
+        let user = getters.getCredentials
+        let config = { service: 'signup', payload: user }
+        return new Promise((resolve, reject) => {
+            dispatch('requestApi', config, { root: true })
+                .then((response) => {
+                    if (response.status === 200) {
+                        dispatch('handleSignupSuccess', {
+                            response,
+                            message: 'User creation failed.'
+                        })
+                    } else if (response.status === 400) {
+                        dispatch('handleSignupFailure', {
+                            response,
+                            message: 'User creation failed.'
+                        })
+                    } else if (response.status === 403) {
+                        // Email already in use
+                        dispatch('handleSignupFailure', {
+                            response,
+                            message: 'Email is already in use.'
+                        })
+                    }
+                    resolve(response)
+                })
+                .catch((error) => {
+                    dispatch('handleSignupFailure', {
+                        error,
+                        message: 'Error on client.'
+                    })
+                    reject(error)
+                })
+                .finally(() => {
+                    commit(REMOVE_CREDENTIALS)
+                })
+        })
+    },
+
+    handleSignupSuccess ({ commit }, { response }) {
+        commit(UPDATE_USER_REGISTRATION)
+        commit(CHANGE_SERVER_AUTH_STATUS,
+            response.status, { root: true })
+        commit(SET_SERVER_AUTH_MESSAGE,
+            'New User created.', { root: true })
+    },
+
+    handleSignupFailure ({ commit }, { error, message }) {
+        commit(SET_USER_ERROR)
+        commit(CHANGE_SERVER_REGISTRATION_STATUS,
+            error.status, { root: true })
+        commit(SET_SERVER_REGISTRATION_MESSAGE,
+            message, { root: true })
     },
 
     handleLoginSucces ({ commit }, { response }) {

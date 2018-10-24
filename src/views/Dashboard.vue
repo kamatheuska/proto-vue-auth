@@ -1,7 +1,7 @@
 <template>
     <main class="Dashboard container__main">
         <div>
-            <h1>Hello</h1><br>
+            <h1>Vue Auth Components</h1><br>
             <button class="button" @click="toggleLogin">Login</button>
             <button class="button" @click="logoutUser">Logout</button>
             <button class="button" @click="toggleSignup">Signup</button>
@@ -33,33 +33,30 @@ import {
     mapActions
 } from 'vuex'
 
+import {
+    TOGGLE_LOGIN,
+    TOGGLE_SIGNUP
+} from '@/store/mutation-types'
+
 export default {
     name: 'app-dash',
     data () {
-        return {
-            showLogin: false,
-            showSignup: false
-        }
+        return {}
     },
-    components: {
-        Login,
-        Signup
-    },
+    components: { Login, Signup },
     computed: {
-        ...mapState(['server']),
+        ...mapState(['server', 'showLogin', 'showSignup']),
         ...mapGetters('users', ['isUserAuthenticated'])
     },
     methods: {
         ...mapActions('users', ['logoutUser']),
 
         toggleLogin () {
-            this.showSignup = false
-            this.showLogin = !this.showLogin
+            this.$store.commit(TOGGLE_LOGIN)
         },
 
         toggleSignup () {
-            this.showLogin = false
-            this.showSignup = !this.showSignup
+            this.$store.commit(TOGGLE_SIGNUP)
         }
     }
 }

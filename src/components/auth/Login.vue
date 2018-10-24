@@ -21,7 +21,7 @@
                 </button>
                 <h5>{{ server.auth.message }}</h5>
                 <slot name="isRegistered">
-                    <h4>No estás registrado?</h4>
+                    <h4 @click="goToSignup">No estás registrado?</h4>
                 </slot>
             </div>
         </transition>
@@ -30,7 +30,10 @@
 
 <script>
 import { mapActions, mapState, mapGetters } from 'vuex'
-import { UPDATE_USER_PROPS } from '@/store/mutation-types'
+import {
+    UPDATE_USER_PROPS,
+    TOGGLE_SIGNUP
+} from '@/store/mutation-types'
 
 export default {
     name: 'login-app',
@@ -76,6 +79,10 @@ export default {
                     // this.$router.push('')
                 })
                 .catch(console.error)
+        },
+
+        goToSignup () {
+            this.$store.commit(TOGGLE_SIGNUP)
         }
     }
 }
@@ -84,6 +91,7 @@ export default {
 .Login {
     margin-top: 10rem;
     display: flex;
+    padding: 1.4rem;
     flex-direction: column;
     justify-content: center;
     align-content: space-around;
@@ -100,20 +108,12 @@ export default {
     margin: 1rem 0;
     height: 4.6rem;
 }
-.Login p {
+.Login h4 {
     cursor: pointer;
     z-index: 10000;
 }
 
-.Login p:hover {
+.Login h4:hover {
     color: #de8162;
-}
-@media only screen and (min-width: 1000px) {
-    .Home {
-        padding-top: 8rem;
-    }
-    .Home__logo {
-        width: 60rem;
-    }
 }
 </style>
