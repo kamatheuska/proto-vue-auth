@@ -5,8 +5,8 @@ import axios from 'axios'
 import {
     CHANGE_SERVER_AUTH_STATUS,
     SET_SERVER_AUTH_MESSAGE,
-    CHANGE_SERVER_REGISTER_STATUS,
-    SET_SERVER_REGISTER_MESSAGE
+    CHANGE_SERVER_REGISTRATION_STATUS,
+    SET_SERVER_REGISTRATION_MESSAGE
 } from '@/store/mutation-types'
 
 import users from './modules/users'
@@ -37,10 +37,10 @@ export default new Vuex.Store({
         [SET_SERVER_AUTH_MESSAGE] ({ server }, message) {
             server.auth.message = message
         },
-        [CHANGE_SERVER_REGISTER_STATUS] ({ server }, status) {
+        [CHANGE_SERVER_REGISTRATION_STATUS] ({ server }, status) {
             server.register = status
         },
-        [SET_SERVER_REGISTER_MESSAGE] ({ server }, message) {
+        [SET_SERVER_REGISTRATION_MESSAGE] ({ server }, message) {
             server.register.message = message
         }
     },
@@ -53,7 +53,7 @@ export default new Vuex.Store({
                     return axios.create()
                         .post('/users/login', payload)
 
-                case 'register':
+                case 'signup':
                     return axios.create()
                         .post('/users', payload)
 
