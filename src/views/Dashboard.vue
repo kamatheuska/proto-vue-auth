@@ -4,14 +4,14 @@
             <h1>Hello</h1><br>
             <button class="button" @click="toggleLogin">Login</button>
             <button class="button" @click="logoutUser">Logout</button>
-            <button class="button" @click="toggleRegister">Register</button>
+            <button class="button" @click="toggleSignup">Signup</button>
             <br>
             <br>
             <hr>
             <h4 class="Dashboard__status"><strong>AUTH STATUS: </strong>
                 <em>{{ server.auth.message }}</em>
             </h4>
-            <h4 class="Dashboard__status"><strong>REGISTER STATUS:</strong>
+            <h4 class="Dashboard__status"><strong>SIGNUP STATUS:</strong>
                 <em>{{ server.register.message }}</em>
             </h4>
             <h4 class="Dashboard__status"><strong>IS AUTHENTICATED? :</strong>
@@ -19,7 +19,7 @@
             </h4>
         </div>
         <Login v-if="!isUserAuthenticated && showLogin" />
-        <Signup v-if="!isUserAuthenticated && showRegister" />
+        <Signup v-if="!isUserAuthenticated && showSignup" />
     </main>
 </template>
 
@@ -38,7 +38,7 @@ export default {
     data () {
         return {
             showLogin: false,
-            showRegister: false
+            showSignup: false
         }
     },
     components: {
@@ -53,11 +53,13 @@ export default {
         ...mapActions('users', ['logoutUser']),
 
         toggleLogin () {
+            this.showSignup = false
             this.showLogin = !this.showLogin
         },
 
-        toggleRegister () {
-            this.showRegister = !this.showRegister
+        toggleSignup () {
+            this.showLogin = false
+            this.showSignup = !this.showSignup
         }
     }
 }

@@ -4,6 +4,7 @@
             <div>
                 <slot name="welcomeMessage">
                     <h2>¡Bienvenido!</h2>
+                    <h4>Inicia sesión:</h4>
                 </slot>
                 <input
                     type="email"
