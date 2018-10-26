@@ -1,55 +1,60 @@
 <template>
-    <div class="Signup">
-        <transition name="fade">
-            <div>
-                <slot name="welcomeMessage">
-                    <h2>¡Bienvenido!</h2>
-                    <h4>Regístrate:</h4>
-                </slot>
-                <input
-                    type="email"
-                    v-model="email"
-                    placeholder="Email Address">
-                <input
-                    type="password"
-                    :class="[passwordErrorClass, matchingPasswordsClass]"
-                    v-model="password"
-                    placeholder="Password">
-                <input
-                    type="password"
-                    :class="[passwordErrorClass, matchingPasswordsClass]"
-                    v-model="passwordCheck"
-                    @keyup.enter="handleSignup()"
-                    placeholder="Password">
-                <transition name="fade">
-                    <div>
-                        <h6 v-if="passwordConfirmation.length > 4 && !passwordMatch">
-                            Las contraseñas no coinciden
-                        </h6>
-                        <h6 v-if="passwordConfirmation.length > 4 && passwordMatch">
-                            ¡Hurray! Las contraseñas coinciden!
-                        </h6>
-                    </div>
-                </transition>
-                <button class="button"
-                    @click="handleSignup()">
-                    <slot>Registrarse</slot>
-                </button>
-                <h5>{{ server.auth.message }}</h5>
-                <slot name="isRegistered">
-                    <h4 @click="goToLogin">Ya tengo una cuenta...</h4>
-                </slot>
-            </div>
-        </transition>
+<div class="Signup">
+    <slot name="welcomeMessage">
+        <h2 class="Signup__h2">¡Bienvenido!</h2>
+        <h4 class="Signup__h4">Regístrate:</h4>
+    </slot>
+    <input
+        class="Signup__login"
+        type="email"
+        v-model="email"
+        placeholder="Email Address">
+    <input
+        class="Signup__login"
+        type="password"
+        :class="[passwordErrorClass, matchingPasswordsClass]"
+        v-model="password"
+        placeholder="Password">
+    <input
+        type="password"
+        class="Signup__login"
+        :class="[passwordErrorClass, matchingPasswordsClass]"
+        v-model="passwordCheck"
+        @keyup.enter="handleSignup()"
+        placeholder="Password">
+    <div>
+        <h6 class="Signup__h6" v-if="passwordConfirmation.length > 4 && !passwordMatch">
+            Las contraseñas no coinciden
+        </h6>
+        <h6 class="Signup__h6" v-if="passwordConfirmation.length > 4 && passwordMatch">
+            ¡Hurray! Las contraseñas coinciden!
+        </h6>
     </div>
+    <button class="Auth__button"
+        @click="handleSignup()">
+        <slot>Registrarse</slot>
+    </button>
+    <div class="Signup__server-messages">
+        <h5 class="Signup__h5">{{ server.auth.message }}</h5>
+        <slot name="isRegistered">
+            <h4 class="Signup__h4" @click="goToLogin">Ya tengo una cuenta...</h4>
+        </slot>
+    </div>
+</div>
 </template>
 
 <script>
-import { mapActions, mapState, mapGetters } from 'vuex'
+import './resetStyles.css'
+import {
+    mapActions,
+    mapState,
+    mapGetters
+} from 'vuex'
 import {
     UPDATE_USER_PROPS,
-    TOGGLE_LOGIN
-} from '@/store/mutation-types'
+    TOGGLE_LOGIN,
+    TOGGLE_SIGNUP
+} from '@/auth/mutation-types'
 
 export default {
     name: 'sign-up-app',
@@ -60,9 +65,9 @@ export default {
         }
     },
     computed: {
-        ...mapState('users', [ 'user' ]),
-        ...mapState([ 'server' ]),
-        ...mapGetters('users', [ 'auth' ]),
+        ...mapState('users', ['user']),
+        ...mapState('server', ['server']),
+        ...mapGetters('users', ['auth']),
 
         passwordErrorClass () {
             if (this.passwordConfirmation.length > 4) {
@@ -115,7 +120,7 @@ export default {
         }
     },
     methods: {
-        ...mapActions('users', [ 'signupUser' ]),
+        ...mapActions('users', ['signupUser']),
 
         confirmPassword (password) {
             if (this.user.credentials.password !== password) {
@@ -130,8 +135,12 @@ export default {
             if (this.passwordMatch) {
                 this.signupUser()
                     .then((res) => {
+                        this.$store.commit(`server/${TOGGLE_SIGNUP}`)
                     })
-                    .catch((error) => console.error('ERROR handleSignup\n', error))
+                    .catch((error) => {
+                        console.error('ERROR handleSignup\n', error)
+                        this.$store.commit(`server/${TOGGLE_SIGNUP}`)
+                    })
             }
         },
 
@@ -141,10 +150,10 @@ export default {
     }
 }
 </script>
-<style scoped>
 
+<style scoped>
 .Signup {
-    margin-top: 10rem;
+    margin-top: 2rem;
     display: flex;
     padding: 1.4rem;
     flex-direction: column;
@@ -152,27 +161,30 @@ export default {
     align-content: space-around;
     max-width: 37rem;
 }
+
 .Signup input {
     width: 100%;
     padding: 1rem;
     margin: 1rem 0;
 }
+
 .Signup__input-error {
     color: #f59f9f;
     border: solid 2px #f59f9f;
     transition: all .3s ease;
 }
+
 .Signup__input-success {
     color: #81c590;
     border: solid 2px #81c590;
     transition: all .3s ease;
 }
+
 .Signup .button {
     width: 100%;
-    padding: 1rem;
-    margin: 1rem 0;
     height: 4.6rem;
 }
+
 .Signup p {
     cursor: pointer;
     z-index: 10000;
@@ -181,12 +193,13 @@ export default {
 .Signup p:hover {
     color: #de8162;
 }
-.Signup h4 {
+
+.Signup__h4 {
     cursor: pointer;
     z-index: 10000;
 }
 
-.Signup h4:hover {
+.Signup__server-messages:hover {
     color: #de8162;
 }
 </style>

@@ -12,14 +12,14 @@ import {
     SET_SERVER_REGISTRATION_MESSAGE,
     CHANGE_SERVER_AUTH_STATUS,
     CHANGE_SERVER_REGISTRATION_STATUS
-} from '@/store/mutation-types'
+} from '@/auth/mutation-types'
 
 const state = {
     user: {
         name: '',
-        email: '',
+        email: 'test123@test.com',
         credentials: {
-            password: '',
+            password: '123123123',
             token: ''
         },
         auth: {
@@ -43,12 +43,6 @@ const getters = {
     },
     getUserToken: ({ user }) => user.credentials.token,
     isUserAuthenticated: ({ user }) => user.auth.isAuthenticated
-/*     authStatus: state => state.status,
-    getCurrentUser: state =>
-        state.current.filter((user) => user.isAuthenticated),
-    getUserModel: state => _.cloneDeep(state.userModel),
-    registrationError: state => state.authErrors.registration,
-    loginError: state => state.authErrors.login */
 }
 
 const mutations = {
@@ -116,7 +110,7 @@ const actions = {
         let credentials = getters.getCredentials
         let config = { service: 'login', payload: credentials }
         return new Promise((resolve, reject) =>
-            dispatch('requestApi', config, { root: true })
+            dispatch('server/requestApi', config, { root: true })
                 .then((response) => {
                     dispatch('handleLoginSucces', { response })
                     resolve(response)
@@ -137,7 +131,7 @@ const actions = {
         }
         let config = { service: 'logout', payload: token }
         return new Promise((resolve, reject) => {
-            dispatch('requestApi', config, { root: true })
+            dispatch('server/requestApi', config, { root: true })
                 .then((response) => {
                     dispatch('handleLogoutSucces', { response })
                     resolve(response)
@@ -152,8 +146,8 @@ const actions = {
     signupUser ({ commit, getters, dispatch }) {
         let user = getters.getCredentials
         let config = { service: 'signup', payload: user }
-        return new Promise((resolve, reject) => {
-            dispatch('requestApi', config, { root: true })
+        return new Promise((resolve, reject) =>
+            dispatch('server/requestApi', config, { root: true })
                 .then((response) => {
                     if (response.status === 200) {
                         dispatch('handleSignupSuccess', {
@@ -183,50 +177,39 @@ const actions = {
                 })
                 .finally(() => {
                     commit(REMOVE_CREDENTIALS)
-                })
-        })
+                }))
     },
 
     handleSignupSuccess ({ commit }, { response }) {
         commit(UPDATE_USER_REGISTRATION)
-        commit(CHANGE_SERVER_AUTH_STATUS,
-            response.status, { root: true })
-        commit(SET_SERVER_AUTH_MESSAGE,
-            'New User created.', { root: true })
+        commit(`server/${CHANGE_SERVER_AUTH_STATUS}`, response.status, { root: true })
+        commit(`server/${SET_SERVER_AUTH_MESSAGE}`, 'New User created.', { root: true })
     },
 
-    handleSignupFailure ({ commit }, { error, message }) {
+    handleSignupFailure ({ commit }, { response, message }) {
         commit(SET_USER_ERROR)
-        commit(CHANGE_SERVER_REGISTRATION_STATUS,
-            error.status, { root: true })
-        commit(SET_SERVER_REGISTRATION_MESSAGE,
-            message, { root: true })
+        commit(`server/${CHANGE_SERVER_REGISTRATION_STATUS}`, 400, { root: true })
+        commit(`server/${SET_SERVER_REGISTRATION_MESSAGE}`, message, { root: true })
     },
 
     handleLoginSucces ({ commit }, { response }) {
         commit(SET_USER_TOKEN, response)
         commit(SET_USER_AUTH)
-        commit(CHANGE_SERVER_AUTH_STATUS,
-            response.status, { root: true })
-        commit(SET_SERVER_AUTH_MESSAGE,
-            'Login succesful.', { root: true })
+        commit(`server/${CHANGE_SERVER_AUTH_STATUS}`, response.status, { root: true })
+        commit(`server/${SET_SERVER_AUTH_MESSAGE}`, 'Login succesful.', { root: true })
     },
 
     handleLoginFailure ({ commit }) {
         commit(SET_USER_ERROR)
-        commit(CHANGE_SERVER_AUTH_STATUS,
-            400, { root: true })
-        commit(SET_SERVER_AUTH_MESSAGE,
-            'Error on login.', { root: true })
+        commit(`server/${CHANGE_SERVER_AUTH_STATUS}`, 400, { root: true })
+        commit(`server/${SET_SERVER_AUTH_MESSAGE}`, 'Error on login.', { root: true })
     },
 
     handleLogoutSucces ({ commit }, { response }) {
         commit(REMOVE_USER_TOKEN)
         commit(REMOVE_USER_AUTH)
-        commit(CHANGE_SERVER_AUTH_STATUS,
-            response.status, { root: true })
-        commit(SET_SERVER_AUTH_MESSAGE,
-            'Logout succesful.', { root: true })
+        commit(`server/${CHANGE_SERVER_AUTH_STATUS}`, response.status, { root: true })
+        commit(`server/${SET_SERVER_AUTH_MESSAGE}`, 'Logout succesful.', { root: true })
     },
 
     handleLogoutFailure ({ commit }) {
